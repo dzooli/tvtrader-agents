@@ -19,15 +19,16 @@ from tvt_agents.distributor import Distributor
 from tvt_agents.distributor.source.websocket import WebSocketSource
 from tvt_agents.examples.threaded_target import run_example as threaded_example
 
-DEFAULT_LOG_LEVEL="DEBUG"
+DEFAULT_LOG_LEVEL = "DEBUG"
 DEFAULT_LOG_INT = -1
 try:
-    DEFAULT_LOG_INT=logging.getLevelNamesMapping()[DEFAULT_LOG_LEVEL]
+    DEFAULT_LOG_INT = logging.getLevelNamesMapping()[DEFAULT_LOG_LEVEL]
 except KeyError:
     print(f"Invalid default log level! ({DEFAULT_LOG_LEVEL})")
     sys.exit(1)
 
 dist_targets = []
+
 
 def setup_logging(level: int = logging.DEBUG):
     res_logger = ws4py.configure_logger(level=level)
@@ -46,6 +47,9 @@ logger = setup_logging(DEFAULT_LOG_INT)
 def collect_dist_targets(src: str = "targets"):
     """Collecting the distribution target modules.
 
+    A module is identified as a target module (plugin) when it has an exported function with ```create_XXX_target``` naming convention.
+    This function should be imported and called to initialize the distributor target.
+
     Args:
         src (str, optional): Directory relative to the script from where target plugins should be loaded. Defaults to "targets".
     """
@@ -55,19 +59,13 @@ def collect_dist_targets(src: str = "targets"):
     logger.info("Collecting custom targets...")
     targets_module = importlib.import_module(src, src)
     for name in targets_module.__all__:
-        if (
-            callable(eval(f"targets_module.{name}"))
-            and name.startswith("create_")
-            and name.endswith("_target")
-        ):
+        if callable(eval(f"targets_module.{name}")) and name.startswith("create_") and name.endswith("_target"):
             logger.info(f"Found target factory: {name}. Registration...")
             obj = None
             try:
                 obj = eval(f"targets_module.{name}")()
             except Exception:
-                logger.critical(
-                    f"Cannot instantiate the distributor target with: {name}"
-                )
+                logger.critical(f"Cannot instantiate the distributor target with: {name}")
             if obj:
                 logger.info(f"{obj} has been registered by {name}")
                 logger.debug(type(obj))
@@ -99,9 +97,7 @@ def timing():
 @click.option("--count", default=1000, help="Number of messages to process.")
 @click.option(
     "--log_level",
-    type=click.Choice(
-        ["DEBUG", "ERROR", "WARNING", "INFO", "CRITICAL"], case_sensitive=False
-    ),
+    type=click.Choice(["DEBUG", "ERROR", "WARNING", "INFO", "CRITICAL"], case_sensitive=False),
     default=DEFAULT_LOG_LEVEL,
     help="Set logging level.",
 )
@@ -127,9 +123,7 @@ def show():
 )
 @click.option(
     "--log_level",
-    type=click.Choice(
-        ["DEBUG", "ERROR", "WARNING", "INFO", "CRITICAL"], case_sensitive=False
-    ),
+    type=click.Choice(["DEBUG", "ERROR", "WARNING", "INFO", "CRITICAL"], case_sensitive=False),
     default=DEFAULT_LOG_LEVEL,
     help="Set logging level.",
 )
@@ -183,16 +177,12 @@ def validate_url_scheme(url: str, req_scheme: str = "ws") -> bool:
 @cli.command
 @click.option(
     "--log_level",
-    type=click.Choice(
-        ["DEBUG", "ERROR", "WARNING", "INFO", "CRITICAL"], case_sensitive=False
-    ),
+    type=click.Choice(["DEBUG", "ERROR", "WARNING", "INFO", "CRITICAL"], case_sensitive=False),
     default=DEFAULT_LOG_LEVEL,
     help="Set logging level.",
 )
-@click.option(
-    "--src", default="targets", help="Directory for dynamic target modules."
-)
-@click.option('--ws_url', default="wss://socketsbay.com/wss/v2/1/demo/", help="Websocket distribution source URL.")
+@click.option("--src", default="targets", help="Directory for dynamic target modules.")
+@click.option("--ws_url", default="wss://socketsbay.com/wss/v2/1/demo/", help="Websocket distribution source URL.")
 async def start(src: str, log_level: str, ws_url: str):
     """Start the distributor with WS source and targets from [src] directory.
 
