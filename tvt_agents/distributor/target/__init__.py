@@ -12,9 +12,7 @@ from typing import TypeVar
 
 from ..base import AbstractDistributorEndpoint
 
-CAbstractDistributionTarget = TypeVar(
-    "CAbstractDistributionTarget", bound="AbstractDistributionTarget"
-)
+CAbstractDistributionTarget = TypeVar("CAbstractDistributionTarget", bound="AbstractDistributionTarget")
 
 
 class AbstractDistributionTarget(AbstractDistributorEndpoint, metaclass=ABCMeta):
@@ -27,9 +25,7 @@ class AbstractDistributionTarget(AbstractDistributorEndpoint, metaclass=ABCMeta)
         ...
 
 
-CThreadedDistributionTarget = TypeVar(
-    "CThreadedDistributionTarget", bound="ThreadedDistributionTarget"
-)
+CThreadedDistributionTarget = TypeVar("CThreadedDistributionTarget", bound="ThreadedDistributionTarget")
 
 
 class ThreadedDistributionTarget(AbstractDistributionTarget):
@@ -46,9 +42,7 @@ class ThreadedDistributionTarget(AbstractDistributionTarget):
             poolsize (int, optional): Size of the thread-pool. Defaults to 10.
             initializer (Callable | None, optional): Custom initialization function for the processing threads. Defaults to None.
         """
-        self._pool = ThreadPoolExecutor(
-            poolsize, initializer=initializer if initializer is not None else None
-        )
+        self._pool = ThreadPoolExecutor(poolsize, initializer=initializer if initializer is not None else None)
 
     def open(self):
         """Opened and started by the constructor."""
@@ -81,7 +75,6 @@ class ThreadedDistributionTarget(AbstractDistributionTarget):
         Args:
             result (Any): The result of the processing.
         """
-        pass
 
     @abstractmethod
     def on_timeout(self, result):
@@ -90,7 +83,6 @@ class ThreadedDistributionTarget(AbstractDistributionTarget):
         Args:
             result (Any): The result of the timed-out processing thread.
         """
-        pass
 
     @abstractmethod
     def on_cancel(self, result):
@@ -99,12 +91,10 @@ class ThreadedDistributionTarget(AbstractDistributionTarget):
         Args:
             result (Any): The result of the cancelled processing thread.
         """
-        pass
 
     @abstractmethod
     def on_error(self, exception):
         """Callback method for exception raised in the process() call."""
-        pass
 
     async def on_message(self, message: str):
         """Submit a task with the given message as a parameter and set the callback functions
@@ -125,7 +115,6 @@ class ThreadedDistributionTarget(AbstractDistributionTarget):
         Args:
             message (str): The message to process.
         """
-        pass
 
     def close(self, code: int = -1, reason: str = ""):
         """Close the thread-pool

@@ -6,5 +6,3 @@
 -->
 
 # Distributor and the agents
-
-
