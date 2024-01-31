@@ -3,8 +3,8 @@
 # This software is released under the MIT License.
 # https://opensource.org/licenses/MIT
 
-import asyncclick as click
 from time import perf_counter
+import asyncclick as click
 from tvt_agents.examples.threaded_target import run_example as threaded_example
 
 
