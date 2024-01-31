@@ -3,31 +3,30 @@
 # This software is released under the MIT License.
 # https://opensource.org/licenses/MIT
 
-import importlib
 import logging
-import os
 import sys
-from time import perf_counter
 
-from pprint import pprint
 from urllib3 import util as url_util
 import asyncclick as click
 import ws4py
 import wsaccel
 
+from tvt_agents.cli import DEFAULT_LOG_LEVEL
+from tvt_agents.distributor.target.collector import collect_dist_targets
 from tvt_agents.distributor import Distributor
 from tvt_agents.distributor.source.websocket import WebSocketSource
-from tvt_agents.examples.threaded_target import run_example as threaded_example
 
-DEFAULT_LOG_LEVEL = "DEBUG"
+from tvt_agents.cli.show import show as cli_show
+from tvt_agents.cli.example import example as cli_example
+from tvt_agents.cli.timing import timing as cli_timing
+
+
 DEFAULT_LOG_INT = -1
 try:
     DEFAULT_LOG_INT = logging.getLevelNamesMapping()[DEFAULT_LOG_LEVEL]
 except KeyError:
     print(f"Invalid default log level! ({DEFAULT_LOG_LEVEL})")
     sys.exit(1)
-
-dist_targets = []
 
 
 def setup_logging(level: int = logging.DEBUG):
@@ -44,107 +43,15 @@ def setup_logging(level: int = logging.DEBUG):
 logger = setup_logging(DEFAULT_LOG_INT)
 
 
-def collect_dist_targets(src: str = "targets"):
-    """Collecting the distribution target modules.
-
-    A module is identified as a target module (plugin) when it has an exported function with ```create_XXX_target``` naming convention.
-    This function should be imported and called to initialize the distributor target.
-
-    Args:
-        src (str, optional): Directory relative to the script from where target plugins should be loaded. Defaults to "targets".
-    """
-    logger.info(f"Path: {os.getcwd()}")
-    logger.debug("Appending $PWD to module search path...")
-    sys.path.append(".")
-    logger.info("Collecting custom targets...")
-    targets_module = importlib.import_module(src, src)
-    for name in targets_module.__all__:
-        if callable(eval(f"targets_module.{name}")) and name.startswith("create_") and name.endswith("_target"):
-            logger.info(f"Found target factory: {name}. Registration...")
-            obj = None
-            try:
-                obj = eval(f"targets_module.{name}")()
-            except Exception:
-                logger.critical(f"Cannot instantiate the distributor target with: {name}")
-            if obj:
-                logger.info(f"{obj} has been registered by {name}")
-                logger.debug(type(obj))
-                if obj not in dist_targets:
-                    dist_targets.append(obj)
-                logger.debug(f"target count: {len(dist_targets)}")
-            else:
-                logger.error("registration failed!")
-
-
-@click.group
-def example():
-    """Run selected example."""
-
-
-@example.command
-@click.option("--count", default=1000, help="Number of messages to process.")
-async def threadedtarget(count: int):
-    """Run the example for ThreadedDistributionTarget."""
-    await threaded_example(count)
-
-
-@click.group
-def timing():
-    """Get timing information of the selected example."""
-
-
-@timing.command
-@click.option("--count", default=1000, help="Number of messages to process.")
-@click.option(
-    "--log_level",
-    type=click.Choice(["DEBUG", "ERROR", "WARNING", "INFO", "CRITICAL"], case_sensitive=False),
-    default=DEFAULT_LOG_LEVEL,
-    help="Set logging level.",
-)
-async def threadedtarget(count: int, log_level):
-    """Measure execution time of ThreadedDistributionTarget."""
-    logger.setLevel(log_level)
-    start_time = perf_counter()
-    await threaded_example(count)
-    print(f"Elapsed time: {(perf_counter() - start_time):0.6f}")
-
-
-@click.group
-def show():
-    """Show various internal information."""
-
-
-@show.command
-@click.option(
-    "--verbose",
-    default=False,
-    is_flag=True,
-    help="Display target's documentation if exists.",
-)
-@click.option(
-    "--log_level",
-    type=click.Choice(["DEBUG", "ERROR", "WARNING", "INFO", "CRITICAL"], case_sensitive=False),
-    default=DEFAULT_LOG_LEVEL,
-    help="Set logging level.",
-)
-def targets(verbose, log_level):
-    """Show loadable distribution targets"""
-    logger.setLevel(log_level)
-    collect_dist_targets()
-    print("\nInitialized targets: ")
-    for obj in dist_targets:
-        print("-", type(obj), "from module:", obj.__module__)
-        if verbose:
-            print("  Documentation:")
-            print("   ", obj.__doc__)
-
-
 @click.group
 def cli():
     """CLI for distributed trading agents."""
 
 
-async def run_websocket_source_loop(logger, websocket_url: str | None = None):
+async def run_websocket_source_loop(logger, websocket_url: str | None = None, targets=None):
+    if not targets:
+        logger.error("No distribution targets specified!")
+        raise ValueError
     if not websocket_url:
         logger.error("WS source not specified!")
         raise ValueError
@@ -157,7 +64,7 @@ async def run_websocket_source_loop(logger, websocket_url: str | None = None):
     )
     ws_source.logger = logger
     dist.add_source(ws_source)
-    for target in dist_targets:
+    for target in targets:
         target.logger = logger
         dist.add_target(target)
     dist.connect()
@@ -174,6 +81,9 @@ def validate_url_scheme(url: str, req_scheme: str = "ws") -> bool:
     return isinstance(p_url, url_util.Url) and isinstance(p_url.scheme, str) and p_url.scheme.startswith(req_scheme)
 
 
+#
+# The main CLI implementation
+#
 @cli.command
 @click.option(
     "--log_level",
@@ -191,18 +101,18 @@ async def start(src: str, log_level: str, ws_url: str):
     Each dynamic target module must define a create_<targetname>_target() function to be detectable as a target module.
     """
     logger.setLevel(log_level)
-    collect_dist_targets(src)
+    dist_targets = collect_dist_targets(src, logger)
     if not validate_url_scheme(ws_url):
         click.secho("Invalid ws_url!", fg="red")
         return
     logger.info("Starting the distributor...")
-    await run_websocket_source_loop(logger, ws_url)
+    await run_websocket_source_loop(logger, ws_url, dist_targets)
 
 
 def main():
-    cli.add_command(show)
-    cli.add_command(example)
-    cli.add_command(timing)
+    cli.add_command(cli_show)
+    cli.add_command(cli_example)
+    cli.add_command(cli_timing)
     cli()
 
 
