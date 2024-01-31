@@ -17,12 +17,6 @@ def timing():
 
 @timing.command
 @click.option("--count", default=1000, help="Number of messages to process.")
-@click.option(
-    "--log_level",
-    type=click.Choice(["DEBUG", "ERROR", "WARNING", "INFO", "CRITICAL"], case_sensitive=False),
-    default=DEFAULT_LOG_LEVEL,
-    help="Set logging level.",
-)
 async def threadedtarget(count: int):
     """Measure execution time of ThreadedDistributionTarget."""
     start_time = perf_counter()
