@@ -48,24 +48,24 @@ def cli():
     """CLI for distributed trading agents."""
 
 
-async def run_websocket_source_loop(logger, websocket_url: str | None = None, targets=None):
+async def run_websocket_source_loop(loop_logger, websocket_url: str | None = None, targets=None):
     if not targets:
-        logger.error("No distribution targets specified!")
+        loop_logger.error("No distribution targets specified!")
         raise ValueError
     if not websocket_url:
-        logger.error("WS source not specified!")
+        loop_logger.error("WS source not specified!")
         raise ValueError
     wsaccel.patch_ws4py()
-    dist = Distributor(logger)
-    dist.logger = logger
+    dist = Distributor()
+    dist.logger = loop_logger
     ws_source = WebSocketSource(
         websocket_url,
         protocols=["http-only", "chat"],
     )
-    ws_source.logger = logger
+    ws_source.logger = loop_logger
     dist.add_source(ws_source)
     for target in targets:
-        target.logger = logger
+        target.logger = loop_logger
         dist.add_target(target)
     dist.connect()
 
