@@ -7,8 +7,6 @@ import asyncclick as click
 from time import perf_counter
 from tvt_agents.examples.threaded_target import run_example as threaded_example
 
-from . import DEFAULT_LOG_LEVEL
-
 
 @click.group
 def timing():
