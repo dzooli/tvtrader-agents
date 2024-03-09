@@ -4,7 +4,7 @@
 # https://opensource.org/licenses/MIT
 
 import asyncclick as click
-from tvt_agents.examples.threaded_target import run_example as threaded_example
+from tvt_agents.example.threaded_target import run_example as threaded_example
 
 
 @click.group
