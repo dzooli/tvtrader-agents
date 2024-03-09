@@ -48,7 +48,9 @@ def cli():
     """CLI for distributed trading agents."""
 
 
-async def run_websocket_source_loop(loop_logger, websocket_url: str | None = None, targets=None):
+async def run_websocket_source_loop(
+    loop_logger, websocket_url: str | None = None, targets=None
+):
     if not targets:
         loop_logger.error("No distribution targets specified!")
         raise ValueError
@@ -56,7 +58,7 @@ async def run_websocket_source_loop(loop_logger, websocket_url: str | None = Non
         loop_logger.error("WS source not specified!")
         raise ValueError
     wsaccel.patch_ws4py()
-    dist = Distributor()
+    dist = Distributor(loop_logger)
     dist.logger = loop_logger
     ws_source = WebSocketSource(
         websocket_url,
@@ -78,7 +80,11 @@ async def run_websocket_source_loop(loop_logger, websocket_url: str | None = Non
 def validate_url_scheme(url: str, req_scheme: str = "ws") -> bool:
     logger.info("Validating URL scheme...")
     p_url = url_util.parse_url(url)
-    return isinstance(p_url, url_util.Url) and isinstance(p_url.scheme, str) and p_url.scheme.startswith(req_scheme)
+    return (
+        isinstance(p_url, url_util.Url)
+        and isinstance(p_url.scheme, str)
+        and p_url.scheme.startswith(req_scheme)
+    )
 
 
 #
@@ -87,12 +93,18 @@ def validate_url_scheme(url: str, req_scheme: str = "ws") -> bool:
 @cli.command
 @click.option(
     "--log_level",
-    type=click.Choice(["DEBUG", "ERROR", "WARNING", "INFO", "CRITICAL"], case_sensitive=False),
+    type=click.Choice(
+        ["DEBUG", "ERROR", "WARNING", "INFO", "CRITICAL"], case_sensitive=False
+    ),
     default=DEFAULT_LOG_LEVEL,
     help="Set logging level.",
 )
 @click.option("--src", default="targets", help="Directory for dynamic target modules.")
-@click.option("--ws_url", default="wss://socketsbay.com/wss/v2/1/demo/", help="Websocket distribution source URL.")
+@click.option(
+    "--ws_url",
+    default="wss://socketsbay.com/wss/v2/1/demo/",
+    help="Websocket distribution source URL.",
+)
 async def start(src: str, log_level: str, ws_url: str):
     """Start the distributor with WS source and targets from [src] directory.
 
