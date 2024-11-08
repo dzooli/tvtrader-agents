@@ -58,7 +58,7 @@ async def run_websocket_source_loop(
         loop_logger.error("WS source not specified!")
         raise ValueError
     wsaccel.patch_ws4py()
-    dist = Distributor(loop_logger)
+    dist = Distributor()
     dist.logger = loop_logger
     ws_source = WebSocketSource(
         websocket_url,
