@@ -15,12 +15,12 @@ classifiers = [
     "Operating System :: Microsoft :: Windows",
     "Environment :: Console",
     "Intended Audience :: Financial and Insurance Industry",
-    "Intended Audience :: Developers"
+    "Intended Audience :: Developers",
 ]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.12"
+python = "^3.12 || ^3.13"
 aio-pika = "^9.0"
 wsaccel = "^0.6.7"
 ws4py = "^0.5.1"
@@ -35,8 +35,8 @@ pytest-otel = "^1.7.1"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.1.2"
-black = {extras = ["d"], version = "^24.3.0"}
-mypy = {extras = ["d"], version = "^1.9.0"}
+black = { extras = ["d"], version = "^24.3.0" }
+mypy = { extras = ["d"], version = "^1.9.0" }
 allure-pytest = "^2.13.2"
 pytest-click = "^1.1.0"
 pytest-cov = "^4.1.0"
@@ -60,6 +60,6 @@ tvtrader_distributor = "tvt_agents.__main__:main"
 
 
 [tool.mypy]
-python_version="3.12"
-python_executable=".venv/Scripts/python.exe"
-ignore_missing_imports=true
+python_version = "3.12"
+python_executable = ".venv/Scripts/python.exe"
+ignore_missing_imports = true
