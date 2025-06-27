@@ -3,6 +3,7 @@ A helper module for flexible logging inside inherited classes.
 """
 
 import logging
+import typing
 from attrs import define, field, validators
 
 
@@ -10,27 +11,25 @@ from attrs import define, field, validators
 class LoggingMixin:
     """Use this logger trait where needed."""
 
-    _logger: logging.Logger = (
-        field(
-            init=True,
-            validator=validators.optional(validators.instance_of(logging.Logger)),
-        ),
+    _logger: typing.Optional[logging.Logger] = field(
+        init=True,
+        default=None,
+        validator=validators.optional(validators.instance_of(logging.Logger)),
     )
 
-    def __init__(self):
-        self._logger: logging.Logger
+    def __init__(self, _logger: typing.Optional[logging.Logger] = None):
+        self._logger = _logger
 
     @property
     def logger(self) -> logging.Logger:
         """The underlying logger."""
-        try:
-            return self._logger
-        except AttributeError:
+        if self._logger is None:
             raise AttributeError(
                 "Logger not set! Please set the logger before using it."
             )
-        except TypeError:
+        if not isinstance(self._logger, logging.Logger):
             raise TypeError("Logger must be an instance of logging.Logger, not None.")
+        return self._logger
 
     @logger.setter
     def logger(self, logger: logging.Logger):
