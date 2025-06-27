@@ -29,8 +29,7 @@ asyncclick = "^8.1.3.4"
 anyio = ">4.6.0"
 urllib3 = "^2.5.0"
 pytest-html-reporter = "^0.2.9"
-pytest = "^8.3.5"
-pytest-otel = "^1.7.1"
+pytest = "^8.4.1"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -41,7 +40,6 @@ allure-pytest = "^2.13.2"
 pytest-click = "^1.1.0"
 pytest-cov = "^6.2.1"
 pytest-json-report = "^1.5.0"
-pytest-otel = "^1.5.0"
 pytest-mock = "^3.12.0"
 pytest-live = "^0.6"
 pytest-sugar = "^1.0.0"
