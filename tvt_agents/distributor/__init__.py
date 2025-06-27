@@ -55,6 +55,10 @@ class Distributor(LoggingMixin):
         for src in self._sources:
             src.open()
 
+    def add_target(self, tgt: AbstractDistributionTarget):
+        self._targets.append(tgt)
+        self.logger.info("target added")
+
     def connect_targets(self):
         self.logger.debug("connecting targets...")
         for tgt in self._targets:
@@ -63,10 +67,6 @@ class Distributor(LoggingMixin):
     def connect(self):
         self.connect_targets()
         self.connect_sources()
-
-    def add_target(self, tgt: AbstractDistributionTarget):
-        self._targets.append(tgt)
-        self.logger.info("target added")
 
     def _enqueue(self, message):
         if self._shutdown_progress:
