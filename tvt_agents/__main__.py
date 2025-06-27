@@ -32,7 +32,9 @@ except KeyError:
 def setup_logging(level: int = logging.DEBUG):
     res_logger = ws4py.configure_logger(level=level)
     fmt = logging.Formatter(
-        "[%(asctime)s.%(msecs)03d] REL:%(relativeCreated)d - PID:%(process)d - %(levelname)s - %(module)s:%(filename)s:%(lineno)s - %(message)s",
+        "[%(asctime)s.%(msecs)03d] REL:%(relativeCreated)d - PID:%(process)d\
+        - %(levelname)s - %(module)s:%(filename)s:%(lineno)s \
+        - %(message)s",
         datefmt="%Y-%m-%d %H:%M:%S",
     )
     for h in res_logger.handlers:
@@ -99,7 +101,8 @@ def validate_url_scheme(url: str, req_scheme: str = "ws") -> bool:
     default=DEFAULT_LOG_LEVEL,
     help="Set logging level.",
 )
-@click.option("--src", default="targets", help="Directory for dynamic target modules.")
+@click.option("--src", default="targets",
+              help="Directory for dynamic target modules.")
 @click.option(
     "--ws_url",
     default="wss://socketsbay.com/wss/v2/1/demo/",
@@ -110,7 +113,8 @@ async def start(src: str, log_level: str, ws_url: str):
 
     src: is './targets' by default.
 
-    Each dynamic target module must define a create_<targetname>_target() function to be detectable as a target module.
+    Each dynamic target module must define a
+    create_<targetname>_target() function to be detectable as a target module.
     """
     logger.setLevel(log_level)
     dist_targets = collect_dist_targets(src, logger)

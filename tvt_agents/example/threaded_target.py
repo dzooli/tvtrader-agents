@@ -4,7 +4,7 @@
 # https://opensource.org/licenses/MIT
 
 
-from tvt_agents.distributor.target import ThreadedDistributionTarget  # noqa: E402
+from tvt_agents.distributor.target import ThreadedDistributionTarget  # noqa: E402, E501
 
 
 class TestThreadedTarget(ThreadedDistributionTarget):
