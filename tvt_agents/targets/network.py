@@ -77,11 +77,17 @@ class TcpTarget(SocketTarget):
     Base class for TCP-based targets.
     """
 
+    def __init__(self, host: str, port: int):
+        super().__init__(host, port)
+
 
 class UdpTarget(SocketTarget):
     """
     Base class for UDP-based targets.
     """
+
+    def __init__(self, host: str, port: int):
+        super().__init__(host, port)
 
     def connect(self):
         """

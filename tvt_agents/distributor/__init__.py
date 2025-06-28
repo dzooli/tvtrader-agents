@@ -6,6 +6,7 @@
 Alert distributor with multiple sources and targets
 
 """
+
 import queue
 from queue import Queue
 from time import sleep

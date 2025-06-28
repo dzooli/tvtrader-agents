@@ -10,7 +10,8 @@ import logging
 
 
 def collect_dist_targets(
-    src: str = "targets", logger: logging.Logger = logging.getLogger()
+    src: str = "targets",
+    logger: logging.Logger = logging.getLogger(),
 ):
     """Collecting the distribution target modules.
 

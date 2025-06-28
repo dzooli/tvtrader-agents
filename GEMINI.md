@@ -16,12 +16,13 @@ or the usage.
 ## General Instructions:
 
 - Use the existing package management software (uv, poerty, hatch, pip) when configured in the project
-- Use the existing virtualenv if found or ask the user to create or specify a path for it 
+- Use the existing virtualenv if found or ask the user to create or specify a path for it
 - When generating new Python code, please follow the existing coding style.
 - Ensure all new functions and classes have MkDocs compatible Python docstrings.
 - Add mkdocs compatible documentation to the beginning of newly generated files.
 - All code should be compatible with Python 3.11+.
 - Use design patterns where necessary (Factory, Observer, etc.) but keep the naming convention as is.
+- Prefer a commit_message.txt for git commit messages to avoid escaping issues.
 
 ## Coding Style:
 
@@ -35,7 +36,7 @@ or the usage.
 - Keep cognitive complexity of methods below 15
 - Method line count should not exceed 30 lines
 - Methods count in a class should not exceed 15
-- Use properties, setter and getters where necessary
+- Use properties, setters and getters where necessary
 
 ## Abstractions:
 

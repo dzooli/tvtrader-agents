@@ -6,6 +6,7 @@
 Source connector interface declarations for message distribution
 
 """
+
 from typing import TypeVar
 from abc import abstractmethod, ABCMeta
 from ..base import AbstractDistributorEndpoint

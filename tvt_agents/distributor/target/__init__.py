@@ -12,7 +12,9 @@ from typing import TypeVar
 
 from ..base import AbstractDistributorEndpoint
 
-CAbstractDistributionTarget = TypeVar("CAbstractDistributionTarget", bound="AbstractDistributionTarget")
+CAbstractDistributionTarget = TypeVar(
+    "CAbstractDistributionTarget", bound="AbstractDistributionTarget"
+)
 
 
 class AbstractDistributionTarget(AbstractDistributorEndpoint, metaclass=ABCMeta):
@@ -21,11 +23,12 @@ class AbstractDistributionTarget(AbstractDistributorEndpoint, metaclass=ABCMeta)
         self.process(message)
 
     @abstractmethod
-    def process(self, message: str):
-        ...
+    def process(self, message: str): ...
 
 
-CThreadedDistributionTarget = TypeVar("CThreadedDistributionTarget", bound="ThreadedDistributionTarget")
+CThreadedDistributionTarget = TypeVar(
+    "CThreadedDistributionTarget", bound="ThreadedDistributionTarget"
+)
 
 
 class ThreadedDistributionTarget(AbstractDistributionTarget):
@@ -42,7 +45,9 @@ class ThreadedDistributionTarget(AbstractDistributionTarget):
             poolsize (int, optional): Size of the thread-pool. Defaults to 10.
             initializer (Callable | None, optional): Custom initialization function for the processing threads. Defaults to None.
         """
-        self._pool = ThreadPoolExecutor(poolsize, initializer=initializer if initializer is not None else None)
+        self._pool = ThreadPoolExecutor(
+            poolsize, initializer=initializer if initializer is not None else None
+        )
 
     def open(self):
         """Opened and started by the constructor."""
