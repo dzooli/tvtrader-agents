@@ -11,6 +11,7 @@ import concurrent.futures as mod_futures
 from typing import TypeVar
 
 from ..base import AbstractDistributorEndpoint
+from tvt_agents.distributor.formatter import IFormatter
 
 CAbstractDistributionTarget = TypeVar(
     "CAbstractDistributionTarget", bound="AbstractDistributionTarget"
@@ -48,6 +49,25 @@ class ThreadedDistributionTarget(AbstractDistributionTarget):
         self._pool = ThreadPoolExecutor(
             poolsize, initializer=initializer if initializer is not None else None
         )
+        self._formatter: IFormatter | None = None
+
+    @property
+    def formatter(self) -> IFormatter | None:
+        """Returns the current formatter.
+
+        Returns:
+            IFormatter | None: The current formatter or None if not set.
+        """
+        return self._formatter
+
+    @formatter.setter
+    def formatter(self, formatter: IFormatter):
+        """Sets the formatter.
+
+        Args:
+            formatter (IFormatter): The formatter to set.
+        """
+        self._formatter = formatter
 
     def open(self):
         """Opened and started by the constructor."""
@@ -107,7 +127,10 @@ class ThreadedDistributionTarget(AbstractDistributionTarget):
         Args:
             message (str): Parameters for processing
         """
-        task = self._pool.submit(self.process, message)
+        formatted_message = message
+        if self._formatter:
+            formatted_message = self._formatter.format(message)
+        task = self._pool.submit(self.process, formatted_message)
         task.add_done_callback(self._check_complete)
 
     @abstractmethod
