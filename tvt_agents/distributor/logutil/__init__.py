@@ -19,16 +19,16 @@ class LoggingMixin:
 
     def __init__(self, _logger: typing.Optional[logging.Logger] = None):
         self._logger = _logger
+        if self._logger is None:
+            self._logger = logging.getLogger(self.__class__.__name__)
+            self._logger.addHandler(logging.NullHandler())
 
     @property
     def logger(self) -> logging.Logger:
         """The underlying logger."""
         if self._logger is None:
-            raise AttributeError(
-                "Logger not set! Please set the logger before using it."
-            )
-        if not isinstance(self._logger, logging.Logger):
-            raise TypeError("Logger must be an instance of logging.Logger, not None.")
+            self._logger = logging.getLogger(self.__class__.__name__)
+            self._logger.addHandler(logging.NullHandler())
         return self._logger
 
     @logger.setter
