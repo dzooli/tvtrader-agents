@@ -10,7 +10,7 @@ To install the TVTrader Agents, follow these steps:
 
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/your-repo/tvtrader-agents.git
+    git clone https://github.com/dzooli/tvtrader-agents.git
     cd tvtrader-agents/agents
     ```
 
@@ -87,4 +87,4 @@ When the distributor starts, it scans the `--src` directory for such functions, 
 
 ### Sources
 
-Similarly, distribution sources (like the `WebSocketSource`) are responsible for providing messages to the distributor. New sources can be integrated by implementing the `AbstractDistributionSource` interface and configuring the distributor to use them.
+Similarly, distribution sources (like the `WebSocketSource`) are responsible for providing messages to the distributor. New sources can be integrated by implementing the `AbstractDistributionSource` interface and configuring the distributor to use them.****
