@@ -12,9 +12,6 @@ class GraphiteTarget(TcpTarget):
 
     def __init__(self, host: str, port: int):
         super().__init__(host, port)
-        super().__init__(host, port)
-        super().__init__(host, port)
-        super().__init__(host, port)
 
     def process(self, message: str):
         """Process the message."""

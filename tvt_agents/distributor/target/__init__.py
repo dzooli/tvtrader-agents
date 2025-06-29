@@ -155,4 +155,3 @@ class ThreadedDistributionTarget(AbstractDistributionTarget):
             nothing: by default. Could be overridden.
         """
         self._pool.shutdown(wait=True, cancel_futures=False)
-        return super().close(code, reason)
