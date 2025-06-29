@@ -39,6 +39,7 @@ class GraphiteFormatter(IFormatter):
 
         strategy_name = alert_data["name"]
         symbol = alert_data["symbol"].replace(":", ".")
+        interval = alert_data["interval"]
         direction = alert_data["direction"]
         price = alert_data["price"]
         timestamp_str = alert_data["timestamp"]
@@ -56,8 +57,8 @@ class GraphiteFormatter(IFormatter):
             direction_value = -1
 
         # Construct metric paths
-        direction_metric_path = f"tvt_agents.{strategy_name}.{symbol}.direction"
-        price_metric_path = f"tvt_agents.{strategy_name}.{symbol}.price"
+        direction_metric_path = f"tvt_agents.{strategy_name}.{symbol}.{interval}.direction"
+        price_metric_path = f"tvt_agents.{strategy_name}.{symbol}.{interval}.price"
 
         # Format metrics
         direction_metric = f"{direction_metric_path} {direction_value} {timestamp_unix}"
