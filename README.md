@@ -57,21 +57,71 @@ tvtrader_distributor start --help
 
 The TVTrader Agents system is designed with a plugin-based architecture for its distribution sources and targets, promoting extensibility and modularity.
 
+### Message Distribution Flow
+
+Messages received by a source are distributed to registered targets through a defined flow:
+
+1.  **`on_message(message: str)`**: This asynchronous method is the entry point for a new message in a `ThreadedDistributionTarget`. It's responsible for preparing the message for processing.
+    *   **Formatter Application**: If a `formatter` is set on the target instance (e.g., `target_instance.formatter = MyFormatter()`), the `on_message` method will automatically apply this formatter to the incoming message before further processing. This allows for flexible message transformation without modifying the core target logic.
+2.  **`process(message: str)`**: This abstract method is where the core logic for handling the message resides. It receives the message (which might have been formatted by `on_message`) and performs the target-specific action (e.g., sending it over a network, writing to a console).
+3.  **`send(data: str)` (for network targets)**: For network-based targets (like `TcpTarget` or `UdpTarget`), the `process` method typically calls a `send` method to transmit the data.
+
 ### Targets
 
 Distribution targets are dynamically loaded from a specified directory (defaulting to `targets/`). A Python module is identified as a target plugin if it defines a function following the naming convention `create_<targetname>_target()`. This function is responsible for instantiating and returning an object that implements the `AbstractDistributionTarget` interface.
 
-**Example Target Module (`targets/my_custom_target.py`):**
+**Implementing a Custom Distribution Target Plugin:**
+
+To create your own target, you need to:
+
+1.  **Implement `AbstractDistributionTarget`**: Your target class must inherit from `AbstractDistributionTarget` and implement its abstract methods (`on_message`, `process`, `on_complete`, `on_timeout`, `on_cancel`, `on_error`).
+2.  **Define a `create_` function**: Create a function named `create_<your_target_name>_target()` in your module. This function will be called by the distributor to instantiate your target.
+3.  **Optional: Use a Formatter**: If your target requires specific message formatting, you can set a formatter instance on your target after its creation. For example, if you have a `GraphiteFormatter`:
+    ```python
+    # targets/my_graphite_target.py
+    from tvt_agents.targets.network import TcpTarget
+    from tvt_agents.distributor.formatters.graphite_formatter import GraphiteFormatter
+
+    class MyGraphiteTarget(TcpTarget):
+        def __init__(self, host: str, port: int):
+            super().__init__(host, port)
+            self.formatter = GraphiteFormatter() # Set the formatter here
+
+        def process(self, message: str):
+            # The message is already formatted by self.formatter in on_message
+            self.send(f"{message}\n")
+
+    def create_my_graphite_target():
+        return MyGraphiteTarget("localhost", 2003) # Example host and port
+    ```
+
+**Example Target Module (inheriting from `ThreadedDistributionTarget` - `targets/my_custom_target.py`):**
 
 ```python
 # targets/my_custom_target.py
-from tvt_agents.distributor.target import AbstractDistributionTarget
+from tvt_agents.distributor.target import ThreadedDistributionTarget
 from attrs import define
 
 @define
-class MyCustomTarget(AbstractDistributionTarget):
+class MyCustomTarget(ThreadedDistributionTarget):
     async def on_message(self, message: str):
-        print(f"MyCustomTarget received: {message}")
+        # If a formatter is set, it will be applied here before process()
+        super().on_message(message)
+
+    def process(self, message: str):
+        print(f"MyCustomTarget received and processed: {message}")
+
+    def on_complete(self, result):
+        print(f"MyCustomTarget completed: {result}")
+
+    def on_timeout(self, result):
+        print(f"MyCustomTarget timed out: {result}")
+
+    def on_cancel(self, result):
+        print(f"MyCustomTarget cancelled: {result}")
+
+    def on_error(self, exception):
+        print(f"MyCustomTarget error: {exception}")
 
     def open(self):
         print("MyCustomTarget opened.")
