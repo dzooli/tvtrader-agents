@@ -1,5 +1,4 @@
-"""Alert distribution specific extension definitions
-"""
+"""Alert distribution specific extension definitions"""
 
 
 class DistributorException(Exception):

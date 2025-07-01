@@ -4,6 +4,7 @@ from tvt_agents.distributor.logutil import LoggingMixin
 
 from .base import ThreadedBase
 
+
 class ConsoleTarget(ThreadedBase, LoggingMixin):
     """Simple console logger target.
     Used for demonstration purposes only.

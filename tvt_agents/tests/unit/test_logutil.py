@@ -1,4 +1,4 @@
-import pytest
+import logging
 
 from tvt_agents.distributor.logutil import LoggingMixin
 
@@ -6,4 +6,4 @@ from tvt_agents.distributor.logutil import LoggingMixin
 def test_logutil_init():
     lmixin = LoggingMixin()
     logger = lmixin.logger
-    assert logger is None
+    assert isinstance(logger, logging.Logger)

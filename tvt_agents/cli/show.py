@@ -22,7 +22,9 @@ def show():
 )
 @click.option(
     "--log_level",
-    type=click.Choice(["DEBUG", "ERROR", "WARNING", "INFO", "CRITICAL"], case_sensitive=False),
+    type=click.Choice(
+        ["DEBUG", "ERROR", "WARNING", "INFO", "CRITICAL"], case_sensitive=False
+    ),
     default=DEFAULT_LOG_LEVEL,
     help="Set logging level.",
 )

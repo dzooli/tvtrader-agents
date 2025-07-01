@@ -6,6 +6,7 @@
 Alert distributor with multiple sources and targets
 
 """
+
 import queue
 from queue import Queue
 from time import sleep
@@ -68,10 +69,39 @@ class Distributor(LoggingMixin):
         self.connect_targets()
         self.connect_sources()
 
-    def _enqueue(self, message):
+    def _enqueue_possible(self, message):
+        """
+        Checks if a message can be enqueued based on the shutdown status.
+
+        Args:
+            message (Any): The message to be checked.
+
+        Returns:
+            bool: True if the message can be enqueued, False if shutdown is in progress.
+        """
         if self._shutdown_progress:
             self.logger.warning("No new messages accepted, shutdown in progress.")
+            return False
+        return True
+
+    def _enqueue(self, message):
+        """
+        Enqueues a message into the internal queue if shutdown is not in progress.
+
+        Args:
+            message (Any): The message to be enqueued. It will be converted to a string before enqueuing.
+
+        Returns:
+            None
+
+        Logs:
+            - Warns if shutdown is in progress and the message is not accepted.
+            - Errors if the queue is full and the message cannot be enqueued.
+            - Info when the message is successfully enqueued.
+        """
+        if not self._enqueue_possible(message):
             return
+
         try:
             self._queue.put_nowait(str(message))
         except queue.Full:
@@ -80,9 +110,21 @@ class Distributor(LoggingMixin):
         self.logger.info("message enqueued...")
 
     def _thread_enqueue(self, message):
-        if self._shutdown_progress:
-            self.logger.warning("No new messages threaded, shutdown in progress.")
+        """
+        Starts a new thread to enqueue a message unless a shutdown is in progress.
+
+        Args:
+            message: The message object to be enqueued.
+
+        Behavior:
+            - If a shutdown is in progress (`self._shutdown_progress` is True), logs a warning and does not enqueue the message.
+            - Otherwise, creates and starts a new thread that calls the `_enqueue` method with the given message.
+            - Appends the new thread to `self._src_threadlist` and logs the thread start.
+        """
+
+        if not self._enqueue_possible(message):
             return
+
         self._src_threadlist.append(
             Thread(target=self._enqueue, kwargs={"message": message})
         )

@@ -101,8 +101,7 @@ def validate_url_scheme(url: str, req_scheme: str = "ws") -> bool:
     default=DEFAULT_LOG_LEVEL,
     help="Set logging level.",
 )
-@click.option("--src", default="targets",
-              help="Directory for dynamic target modules.")
+@click.option("--src", default="targets", help="Directory for dynamic target modules.")
 @click.option(
     "--ws_url",
     default="wss://socketsbay.com/wss/v2/1/demo/",

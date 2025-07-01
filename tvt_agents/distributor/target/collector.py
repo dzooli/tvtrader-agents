@@ -9,7 +9,10 @@ import importlib
 import logging
 
 
-def collect_dist_targets(src: str = "targets", logger: logging.Logger = logging.getLogger()):
+def collect_dist_targets(
+    src: str = "targets",
+    logger: logging.Logger = logging.getLogger(),
+):
     """Collecting the distribution target modules.
 
     A module is identified as a target module (plugin) when it has an exported function with ```create_XXX_target``` naming convention.
@@ -28,7 +31,11 @@ def collect_dist_targets(src: str = "targets", logger: logging.Logger = logging.
     logger.info("Collecting custom targets...")
     targets_module = importlib.import_module(src, src)
     for name in targets_module.__all__:
-        if not (callable(eval(f"targets_module.{name}")) and name.startswith("create_") and name.endswith("_target")):
+        if not (
+            callable(eval(f"targets_module.{name}"))
+            and name.startswith("create_")
+            and name.endswith("_target")
+        ):
             continue
         logger.info(f"Found target factory: {name}. Registration...")
         obj = None
@@ -37,7 +44,9 @@ def collect_dist_targets(src: str = "targets", logger: logging.Logger = logging.
             if not obj:
                 raise ValueError("Invalid target module! Registration falied!")
         except Exception as exc:
-            logger.critical(f"Cannot instantiate the distributor target with: {name}. {str(exc)}")
+            logger.critical(
+                f"Cannot instantiate the distributor target with: {name}. {str(exc)}"
+            )
         logger.info(f"{obj} has been registered by {name}")
         logger.debug(type(obj))
         if obj not in dist_targets:
