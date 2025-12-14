@@ -1,9 +1,9 @@
-[tool.poetry]
+[project]
 name = "tvt_agents"
 version = "0.1.0-a797860"
 description = "Distributed agents framework for the TvTrader suite"
-authors = ["Zoltan Fabian <zoltan.dzooli.fabian@gmail.com>"]
-keywords = ["potery", "messaging", "distributed", "trading", "multithread"]
+authors = [{name = "Zoltan Fabian", email = "zoltan.dzooli.fabian@gmail.com"}]
+keywords = ["poetry", "messaging", "distributed", "trading", "multithread"]
 classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Programming Language :: Python",
@@ -18,46 +18,46 @@ classifiers = [
     "Intended Audience :: Developers",
 ]
 readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "aio-pika",
+    "wsaccel",
+    "ws4py",
+    "attrs",
+    "asyncclick",
+    "anyio>4.6.0",
+    "urllib3",
+    "orjson",
+    "requests>=2.32.0",
+    "zipp>=3.19.1",
+]
 
-[tool.poetry.dependencies]
-python = "^3.12 || ^3.13"
-aio-pika = "^9.0"
-wsaccel = "^0.6.7"
-ws4py = "^0.6.0"
-attrs = "^25.3.0"
-asyncclick = "^8.1.3.4"
-anyio = ">4.6.0"
-urllib3 = "^2.5.0"
-orjson = "^3.10.0"
-
-
-[tool.poetry.group.dev.dependencies]
-ruff = "^0.12.1"
-black = {extras = ["d"], version = "^25.1.0"}
-mypy = { extras = ["d"], version = "^1.9.0" }
-pytest = "^8.4.1"
-allure-pytest = "^2.13.2"
-pytest-click = "^1.1.0"
-pytest-cov = "^6.2.1"
-pytest-json-report = "^1.5.0"
-pytest-mock = "^3.12.0"
-pytest-live = "^0.6"
-pytest-sugar = "^1.0.0"
-pytest-agent = "^0.0.5"
-pytest-bdd = "^8.1.0"
-pytest-asyncio = "^1.0.0"
-
+[project.optional-dependencies]
+dev = [
+    "ruff",
+    "black",
+    "mypy",
+    "pytest",
+    "allure-pytest",
+    "pytest-click",
+    "pytest-cov",
+    "pytest-json-report",
+    "pytest-mock",
+    "pytest-live",
+    "pytest-sugar",
+    "pytest-agent",
+    "pytest-bdd",
+    "pytest-asyncio",
+]
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
-
-[tool.poetry.scripts]
+[project.scripts]
 tvtrader_distributor = "tvt_agents.__main__:main"
 
 
 [tool.mypy]
 python_version = "3.12"
-python_executable = ".venv/Scripts/python.exe"
 ignore_missing_imports = true
